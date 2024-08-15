@@ -1,0 +1,15 @@
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/bin/Debug/net8.0/Restaurants.Application.deps.json
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/bin/Debug/net8.0/Restaurants.Application.dll
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/bin/Debug/net8.0/Restaurants.Application.pdb
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/bin/Debug/net8.0/Restaurants.Domain.dll
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/bin/Debug/net8.0/Restaurants.Domain.pdb
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/Restaurants.Application.csproj.AssemblyReference.cache
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/Restaurants.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/Restaurants.Application.AssemblyInfoInputs.cache
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/Restaurants.Application.AssemblyInfo.cs
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/Restaurants.Application.csproj.CoreCompileInputs.cache
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/Restaura.6AB96A7C.Up2Date
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/Restaurants.Application.dll
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/refint/Restaurants.Application.dll
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/Restaurants.Application.pdb
+/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/obj/Debug/net8.0/ref/Restaurants.Application.dll
