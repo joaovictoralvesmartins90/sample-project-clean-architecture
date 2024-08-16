@@ -3975,32 +3975,35 @@
     ]
   },
   "packageFolders": {
-    "/Users/joaovictor/.nuget/packages/": {}
+    "C:\\Users\\casa\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Infrastructure/Restaurants.Infrastructure.csproj",
+      "projectUniqueName": "C:\\Users\\casa\\Documents\\projetos\\sample-project-clean-architecture\\src\\Restaurants.Infrastructure\\Restaurants.Infrastructure.csproj",
       "projectName": "Restaurants.Infrastructure",
-      "projectPath": "/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Infrastructure/Restaurants.Infrastructure.csproj",
-      "packagesPath": "/Users/joaovictor/.nuget/packages/",
-      "outputPath": "/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Infrastructure/obj/",
+      "projectPath": "C:\\Users\\casa\\Documents\\projetos\\sample-project-clean-architecture\\src\\Restaurants.Infrastructure\\Restaurants.Infrastructure.csproj",
+      "packagesPath": "C:\\Users\\casa\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\casa\\Documents\\projetos\\sample-project-clean-architecture\\src\\Restaurants.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/joaovictor/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\casa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/Restaurants.Application.csproj": {
-              "projectPath": "/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Application/Restaurants.Application.csproj"
+            "C:\\Users\\casa\\Documents\\projetos\\sample-project-clean-architecture\\src\\Restaurants.Application\\Restaurants.Application.csproj": {
+              "projectPath": "C:\\Users\\casa\\Documents\\projetos\\sample-project-clean-architecture\\src\\Restaurants.Application\\Restaurants.Application.csproj"
             }
           }
         }
@@ -4051,7 +4054,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.303/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

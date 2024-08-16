@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "L8Tklu44bYk=",
+  "dgSpecHash": "DTVogPLPotc=",
   "success": true,
-  "projectFilePath": "/Users/joaovictor/Documents/projeto_ca/src/Restaurants.Domain/Restaurants.Domain.csproj",
+  "projectFilePath": "C:\\Users\\casa\\Documents\\projetos\\sample-project-clean-architecture\\src\\Restaurants.Domain\\Restaurants.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
