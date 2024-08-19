@@ -15,6 +15,12 @@ internal class RestaurantsServices(IRestaurantRepository restaurantRepository,
         return await restaurantRepository.Create(restaurant);
     }
 
+    public void DeleteRestaurant(int id)
+    {
+        logger.LogInformation($"Deleting restaurant with id {id}...");
+        restaurantRepository.DeleteRestaurant(id);
+    }
+
     public async Task<IEnumerable<RestaurantDto>> GetAllRestaurants()
     {
         logger.LogInformation("Getting all restaurants");
