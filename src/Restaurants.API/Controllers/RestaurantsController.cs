@@ -1,27 +1,29 @@
 using FluentValidation;
 using FluentValidation.Results;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Restaurants.Application.Dtos;
-using Restaurants.Application.Services;
+using Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
+using Restaurants.Application.Mediator.Restaurants.Commands.DeleteRestaurant;
+using Restaurants.Application.Mediator.Restaurants.Queries.GetAllRestaurants;
 
 namespace Restaurants.API.Controllers;
 
 [ApiController]
 [Route("api/restaurants")]
-public class RestaurantsController(IRestaurantsServices restaurantsServices, IValidator<CreateRestaurantDto> validator) : ControllerBase
+public class RestaurantsController(IMediator mediator, IValidator<CreateRestaurantCommand> validator) : ControllerBase
 {
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var restaurants = await restaurantsServices.GetAllRestaurants();
+        var restaurants = await mediator.Send(new GetAllRestaurantsQuery());
         return Ok(restaurants);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
-        var restaurant = await restaurantsServices.GetRestaurantById(id);
+        var restaurant = await mediator.Send(new GetRestaurantByIdQuery(id));
         if (restaurant == null)
         {
             return NotFound();
@@ -33,34 +35,25 @@ public class RestaurantsController(IRestaurantsServices restaurantsServices, IVa
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantDto createRestaurantDto)
+    public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantCommand createRestaurantCommand)
     {
-        ValidationResult result = await validator.ValidateAsync(createRestaurantDto);
+        ValidationResult result = await validator.ValidateAsync(createRestaurantCommand);
         if (!result.IsValid)
         {
             return BadRequest(result.Errors);
         }
         else
         {
-            int id = await restaurantsServices.Create(createRestaurantDto);
+            int id = await mediator.Send(createRestaurantCommand);
             return CreatedAtAction(nameof(CreateRestaurant), new { id }, null);
         }
 
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteRestaurant([FromRoute] int id)
-    {
-        var restaurant = await restaurantsServices.GetRestaurantById(id);
-        if (restaurant == null)
-        {
-            return NotFound();
-        }
-        else
-        {
-            restaurantsServices.DeleteRestaurant(id);
-            return NoContent();
-        }
-    }
+    //[HttpDelete("{id}")]
+    //public async Task<IActionResult> DeleteRestaurant([FromRoute] int id)
+    //{
+    //    mediator.Send(new DeleteRestaurantCommandHandler(id));
+    //}
 
 }

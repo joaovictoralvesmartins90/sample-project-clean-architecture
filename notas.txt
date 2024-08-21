@@ -1,0 +1,29 @@
+CQRS
+
+Design pattern que divide responsabilidades dependendo do tipo de operação a ser executada: comando ou consulta. Em uma aplicação padrão, a mesma base de dados serve para escrita e leitura.
+Até certo ponto funciona, mas quanto mais complexo fica a aplicação, diferentes modelos podem ser retornados, diferentes retornos criados, etc. Isso acaba gerando inconsistência entre
+o que se lê e o que se escreve, pois as operações podem ocorrer simultaneamente.
+
+Comando: 
+
+-salva dados
+-não retorna dados para o cliente
+-valida modelo
+-processa lógica de aplicação: se vai precisar de algo mais, consulta externa, etc....
+
+Consulta(query):
+
+-recupera dados para o cliente
+-verifica contexto da requisição: por exemplo, se um usuário pode ou não realizar determinada consulta.
+-idempotente: pode executar várias vezes, mas o resultado sempre será o mesmo.
+
+Para solucionar, podemos usar o design pattern mediator, onde uma classe mediadora lida com as classes participantes de determinada operação. Toda a comunicação é feita através do mediador e não entre
+as classes. Em .net se usa o MediatR.
+
+No contexto do CQRS, seria algo mais ou menos assim:
+
+comando1                handlercomando1
+            mediator
+comando2                handlercomando2
+
+Assim, podemos desacoplar serviços, controladores e repositórios, diminuindo dependências e referências, focando-as no mediador.
