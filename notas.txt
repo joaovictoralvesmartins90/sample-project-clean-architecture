@@ -27,3 +27,112 @@ comando1                handlercomando1
 comando2                handlercomando2
 
 Assim, podemos desacoplar serviços, controladores e repositórios, diminuindo dependências e referências, focando-as no mediador.
+
+
+No contexto de um comando:
+
+1-Criar a classe do comando: ela implementa a interface IRequest<T>, para identificar que aquilo é um comando (ou uma query). T é o tipo do seu retorno, se houver.
+Por exemplo: public class CreateRestaurantCommand : IRequest<int> -> indica que vai retornar um inteiro, possivelmente o id do objeto.
+
+using MediatR;
+
+namespace Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
+
+public class CreateRestaurantCommand : IRequest<int>
+{
+    public string Name { get; set; } = default!;
+    public string Description { get; set; } = default!;
+    public string Category { get; set; } = default!;
+    public bool HasDelivery { get; set; }
+    public string? ContactEmail { get; set; }
+    public string? ContactNumber { get; set; }
+    public string? City { get; set; }
+    public string? Street { get; set; }
+    public string? PostalCode { get; set; }
+}
+
+Nada mais é que uma espécie de DTO de criação.
+
+2-Criar a classe que vai tratar a operação, ou o handler: ela implementa a interface IRequestHandler<T, V>, para indicar que vai ser o handler de um comando do tipo T, e que 
+vai ter como retorno algo do tipo V.
+
+Por exemplo: IRequestHandler<CreateRestaurantCommand, int> -> é um handler que lida com os comandos CreateRestaurantCommand e que vai ter um retorno inteiro. Ao implementar, ele usa o 
+método padrão handle:
+
+using AutoMapper;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Restaurants.Domain.Entities;
+using Restaurants.Domain.Repositories;
+
+namespace Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
+
+public class CreateRestaurantCommandHandler(ILogger<CreateRestaurantCommandHandler> logger,
+    IMapper mapper, IRestaurantRepository restaurantRepository) : IRequestHandler<CreateRestaurantCommand, int>
+{
+    public async Task<int> Handle(CreateRestaurantCommand request, CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Creating new restaurant");
+        Restaurant restaurant = mapper.Map<Restaurant>(request);
+        return await restaurantRepository.Create(restaurant);
+    }
+}
+
+Esse handle é chamado automaticamente. É possível ver que também as dependências, que estariam em classes de serviço e/ou repositíorio, ficam em um só lugar.
+
+3-Criar classes de validação se houver: se você usa uma biblioteca como o fluentvalidation, na sua versão mais recente, eles incentivam o uso de validações manuais, ou seja,
+de colocar manualmente o validador desejado e não usar o pipeline de validação do próprio asp.net. Se houver validações, ele pode vir pra cá:
+
+using FluentValidation;
+
+namespace Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
+
+public class CreateRestaurantCommandValidator : AbstractValidator<CreateRestaurantCommand>
+{
+    public CreateRestaurantCommandValidator()
+    {
+        RuleFor(r => r.Name).Length(3, 100);
+        RuleFor(r => r.Description).NotEmpty().WithMessage("Description is required.");
+        RuleFor(r => r.Category).NotEmpty().WithMessage("Category is required.");
+        RuleFor(r => r.ContactEmail).EmailAddress().WithMessage("Provide a valid email address.");
+        RuleFor(r => r.ContactNumber).NotEmpty().WithMessage("Contact number is required.");
+    }
+}
+
+No contexto de uma query: os passos seriam os mesmo, a diferença seria no fato de que os retornos seriam objetos ou listas de objetos.
+
+Já no controlador, no contexto de um post:
+
+ [HttpPost]
+ public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantCommand createRestaurantCommand)
+ {
+     ValidationResult result = await validator.ValidateAsync(createRestaurantCommand);
+     if (!result.IsValid)
+     {
+         return BadRequest(result.Errors);
+     }
+     else
+     {
+         int id = await mediator.Send(createRestaurantCommand);
+         return CreatedAtAction(nameof(CreateRestaurant), new { id }, null);
+     }
+
+ }
+
+ O objeto mediator vai usar o método Send, que recebe um comando, que pode ser um command para alterar dados ou uma query:
+
+ [HttpGet("{id}")]
+public async Task<IActionResult> GetById([FromRoute] int id)
+{
+    var restaurant = await mediator.Send(new GetRestaurantByIdQuery(id));
+    if (restaurant == null)
+    {
+        return NotFound();
+    }
+    else
+    {
+        return Ok(restaurant);
+    }
+}
+
+Só que no caso de uma consulta, basta instanciar o objeto da query que vai como parâmetro. No post, passa passá-lo como parâmetro, pois ele toma o lugar do DTO.

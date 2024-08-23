@@ -4,7 +4,11 @@ using Restaurants.Domain.Entities;
 
 namespace Restaurants.Application.Mediator.Restaurants.Commands.DeleteRestaurant;
 
-public class DeleteRestaurantCommand: IRequest<RestaurantDto>
+public class DeleteRestaurantCommand: IRequest<bool>
 {
-    public int Id { get; set; }
+    public DeleteRestaurantCommand(int id)
+    {
+        Id = id;
+    }
+    public int Id { get; init; }
 }
