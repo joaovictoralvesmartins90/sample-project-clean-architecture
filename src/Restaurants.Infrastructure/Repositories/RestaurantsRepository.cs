@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Restaurants.Domain.Entities;
 using Restaurants.Domain.Repositories;
 using Restaurants.Infrastructure.Persistence;
@@ -14,11 +15,11 @@ internal class RestaurantsRepository(RestaurantsDbContext restaurantsDbContext) 
         return restaurant.Id;
     }
 
-    public void DeleteRestaurant(int id)
+    public async Task DeleteRestaurant(int id)
     {
         var restaurant = restaurantsDbContext.Restaurants.SingleOrDefault(r => r.Id == id);
         restaurantsDbContext.Remove(restaurant);
-        restaurantsDbContext.SaveChanges();
+        await restaurantsDbContext.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<Restaurant>> GetAllRestaurantsAsync()
@@ -29,7 +30,22 @@ internal class RestaurantsRepository(RestaurantsDbContext restaurantsDbContext) 
 
     public async Task<Restaurant> GetRestaurantByIdAsync(int id)
     {
-        var restaurant = await restaurantsDbContext.Restaurants.Include(r => r.Dishes).FirstOrDefaultAsync(r => r.Id == id);
+        var restaurant = await restaurantsDbContext.Restaurants.Include(r => r.Dishes).FirstAsync(r => r.Id == id);
         return restaurant;
+    }
+
+    public async Task UpdateRestaurant(Restaurant restaurant)
+    {
+        var restaurantDB = await restaurantsDbContext.Restaurants.FirstAsync(r => r.Id == restaurant.Id);
+        restaurantDB.Name = restaurant.Name;
+        restaurantDB.Address!.PostalCode = restaurant.Address!.PostalCode;
+        restaurantDB.Address!.Street = restaurant.Address!.Street;
+        restaurantDB.Address!.City = restaurant.Address!.City;
+        restaurantDB.Category = restaurant.Category;
+        restaurantDB.ContactEmail = restaurant.ContactEmail;
+        restaurantDB.ContactNumber = restaurant.ContactNumber;
+        restaurantDB.HasDelivery = restaurant.HasDelivery;
+        restaurantDB.Description = restaurant.Description;
+        await restaurantsDbContext.SaveChangesAsync();
     }
 }

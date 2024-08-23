@@ -4,13 +4,14 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Commands.DeleteRestaurant;
+using Restaurants.Application.Mediator.Restaurants.Commands.UpdateRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Queries.GetAllRestaurants;
 
 namespace Restaurants.API.Controllers;
 
 [ApiController]
 [Route("api/restaurants")]
-public class RestaurantsController(IMediator mediator, IValidator<CreateRestaurantCommand> validator) : ControllerBase
+public class RestaurantsController(IMediator mediator, IValidator<CreateRestaurantCommand> validator, IValidator<UpdateRestaurantCommand> updateValidator) : ControllerBase
 {
 
     [HttpGet]
@@ -59,6 +60,26 @@ public class RestaurantsController(IMediator mediator, IValidator<CreateRestaura
             return NoContent();
         }
         return NotFound();
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> UpdateRestaurant([FromRoute] int id, [FromBody] UpdateRestaurantCommand updateRestaurantCommand)
+    {
+        updateRestaurantCommand.Id = id;
+        ValidationResult result = await updateValidator.ValidateAsync(updateRestaurantCommand);
+        if (!result.IsValid)
+        {
+            return BadRequest(result.Errors);
+        }
+        else
+        {
+            var isUpdated = await mediator.Send(updateRestaurantCommand);
+            if (isUpdated)
+            {
+                return NoContent();
+            }
+            return NotFound();
+        }
     }
 
 }

@@ -16,7 +16,7 @@ public class DeleteRestaurantCommandHandler(IRestaurantRepository restaurantRepo
 
         if(restaurant is not null)
         {
-            restaurantRepository.DeleteRestaurant(request.Id);
+            await restaurantRepository.DeleteRestaurant(request.Id);
             return true;
         }
         return false;
