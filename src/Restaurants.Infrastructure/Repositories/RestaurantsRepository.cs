@@ -38,12 +38,6 @@ internal class RestaurantsRepository(RestaurantsDbContext restaurantsDbContext) 
     {
         var restaurantDB = await restaurantsDbContext.Restaurants.FirstAsync(r => r.Id == restaurant.Id);
         restaurantDB.Name = restaurant.Name;
-        restaurantDB.Address!.PostalCode = restaurant.Address!.PostalCode;
-        restaurantDB.Address!.Street = restaurant.Address!.Street;
-        restaurantDB.Address!.City = restaurant.Address!.City;
-        restaurantDB.Category = restaurant.Category;
-        restaurantDB.ContactEmail = restaurant.ContactEmail;
-        restaurantDB.ContactNumber = restaurant.ContactNumber;
         restaurantDB.HasDelivery = restaurant.HasDelivery;
         restaurantDB.Description = restaurant.Description;
         await restaurantsDbContext.SaveChangesAsync();

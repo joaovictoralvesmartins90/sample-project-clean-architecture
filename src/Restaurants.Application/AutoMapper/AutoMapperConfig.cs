@@ -25,13 +25,6 @@ public class AutoMapperConfig : Profile
                 }));
         CreateMap<Dish, DishDto>();
         CreateMap<DishDto, Dish>();
-        CreateMap<UpdateRestaurantCommand, Restaurant>()
-            .ForMember(dest => dest.Address, opt => opt.MapFrom(
-                src => new Address
-                {
-                    City = src.City,
-                    Street = src.Street,
-                    PostalCode = src.PostalCode,
-                }));
+        CreateMap<UpdateRestaurantCommand, Restaurant>();
     }
 }
