@@ -25,6 +25,5 @@ public class AutoMapperConfig : Profile
                 }));
         CreateMap<Dish, DishDto>();
         CreateMap<DishDto, Dish>();
-        CreateMap<UpdateRestaurantCommand, Restaurant>();
     }
 }

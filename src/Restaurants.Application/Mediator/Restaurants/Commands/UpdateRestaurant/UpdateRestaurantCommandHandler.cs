@@ -11,8 +11,17 @@ public class UpdateRestaurantCommandHandler(ILogger<UpdateRestaurantCommandHandl
     public async Task<bool> Handle(UpdateRestaurantCommand request, CancellationToken cancellationToken)
     {
         logger.LogInformation($"Updating restaurant with id {request.Id}...");
-        var restaurant = mapper.Map<Restaurant>(request);
-        await restaurantRepository.UpdateRestaurant(restaurant);
+        var restaurantDB = await restaurantRepository.GetRestaurantByIdAsync(request.Id);
+        if (restaurantDB == null)
+        {
+            return false;
+        }
+
+        restaurantDB.Name = request.Name;
+        restaurantDB.Description = request.Description;
+        restaurantDB.HasDelivery = request.HasDelivery;
+
+        await restaurantRepository.SaveChanges();
         return true;
     }
 }

@@ -34,12 +34,9 @@ internal class RestaurantsRepository(RestaurantsDbContext restaurantsDbContext) 
         return restaurant;
     }
 
-    public async Task UpdateRestaurant(Restaurant restaurant)
+    public async Task SaveChanges()
     {
-        var restaurantDB = await restaurantsDbContext.Restaurants.FirstAsync(r => r.Id == restaurant.Id);
-        restaurantDB.Name = restaurant.Name;
-        restaurantDB.HasDelivery = restaurant.HasDelivery;
-        restaurantDB.Description = restaurant.Description;
         await restaurantsDbContext.SaveChangesAsync();
     }
+
 }
