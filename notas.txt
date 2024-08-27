@@ -136,3 +136,33 @@ public async Task<IActionResult> GetById([FromRoute] int id)
 }
 
 Só que no caso de uma consulta, basta instanciar o objeto da query que vai como parâmetro. No post, passa passá-lo como parâmetro, pois ele toma o lugar do DTO.
+
+
+=====================
+
+Serilog: é uma biblioteca que serve para executar o log de informações de várias formas e saídas em uma aplicação:
+
+dotnet add package Serilog.AspNetCore -> para aplicações AspNetCore
+
+Como é uma funcionalidade "cross-cutting", ou seja, que serve para toda ou mais de uma parte da aplicação, ela fica geralmente na API e sua configuração é feita em Program.cs:
+
+builder.Host.UseSerilog((context, configuration) => {
+    configuration
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
+        .WriteTo.Console();
+});
+
+São recebidos dois parâmetros: context e configuration. É possível definir a saída (Console()), o nível mínimo de log, inclusive para que namespace, (Para Microsoft, o mínimo é warning, por exemplo).
+É possível alterar também o que é logado como informações sensíveis e a serialização de parâmetros:
+
+Em SQLITE:
+
+protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+{
+    base.OnConfiguring(optionsBuilder);
+    optionsBuilder.UseSqlite($"Data Source={DbPath}").EnableSensitiveDataLogging(); -> permite imprimir informações de parâmetros passados
+}
+
+logger.LogInformation("Updating restaurant: {@Restaurant}", request); -> como ele implementa o ILogger, é possível usá-lo diretamente.
+O @ após o parâmetro indica ao Serilog que vai serializar o objeto request.
