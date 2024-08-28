@@ -166,3 +166,18 @@ protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
 logger.LogInformation("Updating restaurant: {@Restaurant}", request); -> como ele implementa o ILogger, é possível usá-lo diretamente.
 O @ após o parâmetro indica ao Serilog que vai serializar o objeto request.
+
+===========
+
+Documentando a API: uma opção seria usar Swagger, uma ferramenta de documentação:
+
+dotnet add package Swashbuckle.AspNetCore (no projeto da API).
+
+E para habilitar:
+
+1-builder.Services.AddSwaggerGen();
+2-app.UseSwagger();
+3-app.UseSwaggerUI();
+
+Ao rodar a aplicação e ir em <dominio>/swagger será possível ver os endpoints existentes na 
+aplicação.
