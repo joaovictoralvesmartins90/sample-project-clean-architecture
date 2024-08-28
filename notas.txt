@@ -181,3 +181,68 @@ E para habilitar:
 
 Ao rodar a aplicação e ir em <dominio>/swagger será possível ver os endpoints existentes na 
 aplicação.
+
+
+================
+
+Middleware para exceções: 
+
+Suponha que ocorra um erro de conexão ao banco de dados.
+Se a aplicação não possuir um meio de capturar e tratar esses erros, eles podem ir direto como
+uma resposta ao cliente. Uma opção seria em cada endpoint, usar try-catch.
+
+No entanto, isso precisaria ser feito em todo endpoint da aplicação, e lidar com try-catch 
+pode ser custoso. Outra opção seria fazer um middleware.
+
+Nada mais seria que uma operação a ser executada entre a requisição feita e o endpoint. Muito usado
+para validar dados, por exemplo: antes de chegar logo ao endpoint, podemos validar algumas informações
+antes, evitando operações desnecessárias. Por exemplo em Program.cs:
+
+app.UseSerilogRequestLogging();
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+1-requisição chega e vai para o middleware de Serilog. Se estiver tudo certo, ele chama o próximo middleware (next()) semelhante ao express.js.
+2-passa pelo UseHttpsRedirection, depois next();
+3-passa pelo UseAuthorization, next();
+4-por fim o MapControllers, que vai mapear a requisição para uma ação de um controlador, e executá-la.
+
+Quando a requisição é feita, ela volta pelo mesmo pipeline de middleware, que por final, retorna uma
+resposta (response) para o cliente.
+
+Um middleware de captura de exceções seria um try-catch gigante:
+
+try{
+    //faz algo
+    next();
+}catch(exception){
+    //tratar aqui -> retorna logo uma resposta
+}
+
+
+
+namespace Restaurants.API.Middlewares;
+
+public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
+{
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        try
+        {
+            await next.Invoke(context);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, ex.Message);
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync("Something went wrong");
+        }
+    }
+}
+
+A classe implementa IMiddleware que possui o método InvokeAsync. Ele recebe o context e o next (próximo middleware).
+Ele tenta invocar o próximo passando o contexto. Se der algo errado, cai no catch e manda uma resposta de volta.
