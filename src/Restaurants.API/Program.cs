@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
+builder.Services.AddScoped<TimeLoggingMiddleware>();
+
 builder.Services.AddControllers();
 builder.Services.AddApplication();
 builder.Services.AddSwaggerGen();
@@ -32,6 +34,7 @@ if (app.Environment.IsDevelopment())
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<TimeLoggingMiddleware>();
 
 app.UseSerilogRequestLogging();
 
