@@ -246,3 +246,56 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
 
 A classe implementa IMiddleware que possui o método InvokeAsync. Ele recebe o context e o next (próximo middleware).
 Ele tenta invocar o próximo passando o contexto. Se der algo errado, cai no catch e manda uma resposta de volta.
+
+
+==================
+
+Custom exceptions:
+
+Podemos combinar exceptions customizadas com o tratamento de erros com middleware para melhorar o projeto.
+
+Um exemplo é que em nossos handlers, verificamos se a entidade existe ou não, retornando assim, true ou false. Podemos criar uma exception em domain (faz mais sentido pois nosso domínio está lá).
+
+namespace Restaurants.Domain.Exceptions;
+
+public class NotFoundException(string message) : Exception(message)
+{
+}
+
+E usar nos handlers:
+
+var restaurantDB = await restaurantRepository.GetRestaurantByIdAsync(request.Id);
+
+if (restaurantDB is null)
+{
+    throw new NotFoundException($"Restaurant with id {request.Id} not found.");
+}
+
+E no nosso middleware:
+
+
+using Restaurants.Domain.Exceptions;
+
+namespace Restaurants.API.Middlewares;
+
+public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
+{
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        try
+        {
+            await next.Invoke(context);
+        }catch(NotFoundException notFound)
+        {
+            logger.LogWarning(notFound, notFound.Message);
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsync(notFound.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, ex.Message);
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync("Something went wrong");
+        }
+    }
+}

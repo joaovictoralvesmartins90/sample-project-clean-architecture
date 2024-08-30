@@ -2,20 +2,22 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Restaurants.Domain.Entities;
+using Restaurants.Domain.Exceptions;
 using Restaurants.Domain.Repositories;
 
 namespace Restaurants.Application.Mediator.Restaurants.Commands.UpdateRestaurant;
 
-public class UpdateRestaurantCommandHandler(ILogger<UpdateRestaurantCommandHandler> logger, IRestaurantRepository restaurantRepository, IMapper mapper) : IRequestHandler<UpdateRestaurantCommand, bool>
+public class UpdateRestaurantCommandHandler(ILogger<UpdateRestaurantCommandHandler> logger, IRestaurantRepository restaurantRepository) : IRequestHandler<UpdateRestaurantCommand>
 {
-    public async Task<bool> Handle(UpdateRestaurantCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateRestaurantCommand request, CancellationToken cancellationToken)
     {
         logger.LogInformation($"Updating restaurant with id {request.Id}...");
         logger.LogInformation("Updating restaurant: {@Restaurant}", request);
         var restaurantDB = await restaurantRepository.GetRestaurantByIdAsync(request.Id);
-        if (restaurantDB == null)
+        
+        if (restaurantDB is null)
         {
-            return false;
+            throw new NotFoundException($"Restaurant with id {request.Id} not found.");
         }
 
         restaurantDB.Name = request.Name;
@@ -23,6 +25,5 @@ public class UpdateRestaurantCommandHandler(ILogger<UpdateRestaurantCommandHandl
         restaurantDB.HasDelivery = request.HasDelivery;
 
         await restaurantRepository.SaveChanges();
-        return true;
     }
 }
