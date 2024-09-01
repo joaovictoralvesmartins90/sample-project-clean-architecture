@@ -11,7 +11,9 @@ namespace Restaurants.API.Controllers;
 
 [ApiController]
 [Route("api/restaurants")]
-public class RestaurantsController(IMediator mediator, IValidator<CreateRestaurantCommand> validator, IValidator<UpdateRestaurantCommand> updateValidator) : ControllerBase
+public class RestaurantsController(IMediator mediator,
+    IValidator<CreateRestaurantCommand> validator,
+    IValidator<UpdateRestaurantCommand> updateValidator) : ControllerBase
 {
 
     [HttpGet]

@@ -1,12 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Ocsp;
 using Restaurants.Domain.Entities;
 using Restaurants.Domain.Repositories;
 using Restaurants.Infrastructure.Persistence;
 
 namespace Restaurants.Infrastructure.Repositories;
 
-internal class RestaurantsRepository(RestaurantsDbContext restaurantsDbContext) : IRestaurantRepository
+internal class RestaurantsRepository(RestaurantsDbContext restaurantsDbContext) : IDishesRepository
 {
     public async Task<int> Create(Restaurant restaurant)
     {

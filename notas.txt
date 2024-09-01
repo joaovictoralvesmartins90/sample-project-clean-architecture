@@ -299,3 +299,16 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
         }
     }
 }
+
+
+=========================
+
+Subentidades
+
+Em REST, pode ocorrer de algumas entidades só existirem quando uma outra existir primeiro. Por exemplo, no contexto de uma aplicação de restaurantes, a lista de pratos
+daquele restaurante só pode existir quando existir um restaurante primeiro, sendo assim prato uma subentidade. O padrão REST sugere que os caminhos fiquem:
+
+/api/restaurants/{restaurantid}/dishes -> ou seja, a partir do restaurante de id restaurantid, se acessam os seus pratos.
+/api/dishes -> só faria mais sentido se dish/pratos fosse uma entidade auto contida, que não dependesse de outra para existir.
+
+Então, faz mais sentido um controlador separado para a entidade de pratos.
