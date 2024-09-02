@@ -1,7 +1,7 @@
 using AutoMapper;
 using Restaurants.Application.Dtos;
+using Restaurants.Application.Mediator.Dishes.Commands.CreateDish;
 using Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
-using Restaurants.Application.Mediator.Restaurants.Commands.UpdateRestaurant;
 using Restaurants.Domain.Entities;
 
 namespace Restaurants.Application.AutoMapper;
@@ -24,6 +24,7 @@ public class AutoMapperConfig : Profile
                     PostalCode = src.PostalCode,
                 }));
         CreateMap<Dish, DishDto>();
-        CreateMap<DishDto, Dish>();
+        CreateMap<CreateDishCommand, Dish>();
+
     }
 }

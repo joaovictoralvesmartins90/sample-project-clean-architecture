@@ -5,7 +5,7 @@ using Restaurants.Infrastructure.Persistence;
 
 namespace Restaurants.Infrastructure.Repositories;
 
-internal class RestaurantsSqliteRepository(RestaurantsSqliteDbContext restaurantsDbContext) : IDishesRepository
+internal class RestaurantsSqliteRepository(RestaurantsSqliteDbContext restaurantsDbContext) : IRestaurantsRepository
 {
     public async Task<int> Create(Restaurant restaurant)
     {

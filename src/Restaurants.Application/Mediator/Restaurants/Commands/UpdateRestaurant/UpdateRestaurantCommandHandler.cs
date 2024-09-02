@@ -1,13 +1,11 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using Restaurants.Domain.Entities;
 using Restaurants.Domain.Exceptions;
 using Restaurants.Domain.Repositories;
 
 namespace Restaurants.Application.Mediator.Restaurants.Commands.UpdateRestaurant;
 
-public class UpdateRestaurantCommandHandler(ILogger<UpdateRestaurantCommandHandler> logger, IDishesRepository restaurantRepository) : IRequestHandler<UpdateRestaurantCommand>
+public class UpdateRestaurantCommandHandler(ILogger<UpdateRestaurantCommandHandler> logger, IRestaurantsRepository restaurantRepository) : IRequestHandler<UpdateRestaurantCommand>
 {
     public async Task Handle(UpdateRestaurantCommand request, CancellationToken cancellationToken)
     {

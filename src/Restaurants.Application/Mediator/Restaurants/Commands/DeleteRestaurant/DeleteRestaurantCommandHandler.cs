@@ -1,13 +1,11 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using Restaurants.Application.Dtos;
 using Restaurants.Domain.Exceptions;
 using Restaurants.Domain.Repositories;
 
 namespace Restaurants.Application.Mediator.Restaurants.Commands.DeleteRestaurant;
 
-public class DeleteRestaurantCommandHandler(IDishesRepository restaurantRepository, ILogger<DeleteRestaurantCommandHandler> logger) : 
+public class DeleteRestaurantCommandHandler(IRestaurantsRepository restaurantRepository, ILogger<DeleteRestaurantCommandHandler> logger) : 
     IRequestHandler<DeleteRestaurantCommand>
 {
     public async Task Handle(DeleteRestaurantCommand request, CancellationToken cancellationToken)

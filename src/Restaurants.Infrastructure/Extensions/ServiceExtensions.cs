@@ -20,6 +20,7 @@ public static class ServiceExtensions
         //services.AddScoped<IRestaurantSeeder, RestaurantSeeder>();
         services.AddScoped<IRestaurantSeeder, RestaurantSqliteSeeder>();
         //services.AddScoped<IRestaurantRepository, RestaurantsRepository>();
-        services.AddScoped<IDishesRepository, RestaurantsSqliteRepository>();
+        services.AddScoped<IRestaurantsRepository, RestaurantsSqliteRepository>();
+        services.AddScoped<IDishesRepository, DishesSqliteRepository>();
     }
 }
