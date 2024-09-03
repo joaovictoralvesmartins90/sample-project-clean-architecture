@@ -23,7 +23,7 @@ namespace Restaurants.API.Controllers
             {
                 createDishCommand.RestaurantId = restaurantId;
                 int dishId = await mediator.Send(createDishCommand);
-                return CreatedAtAction(nameof(CreateDish), new { dishId }, null);
+                return CreatedAtAction(nameof(GetDishByIdFromRestaurant), new { dishId }, null);
             }
             else
             {
