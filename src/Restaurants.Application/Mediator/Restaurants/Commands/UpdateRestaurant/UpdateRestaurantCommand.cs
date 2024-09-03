@@ -1,9 +1,8 @@
 ﻿using MediatR;
-using Restaurants.Application.Dtos;
 
 namespace Restaurants.Application.Mediator.Restaurants.Commands.UpdateRestaurant;
 
-public class UpdateRestaurantCommand: IRequest
+public class UpdateRestaurantCommand : IRequest
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;

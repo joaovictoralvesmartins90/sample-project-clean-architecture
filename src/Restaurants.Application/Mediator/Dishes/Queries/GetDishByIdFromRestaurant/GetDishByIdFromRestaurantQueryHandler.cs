@@ -2,15 +2,14 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Restaurants.Application.Dtos;
-using Restaurants.Domain.Entities;
 using Restaurants.Domain.Exceptions;
 using Restaurants.Domain.Repositories;
 
 namespace Restaurants.Application.Mediator.Dishes.Queries.GetDishByIdFromRestaurant;
 
-public class GetDishByIdFromRestaurantHandler(IDishesRepository dishesRepository,
+public class GetDishByIdFromRestaurantQueryHandler(IDishesRepository dishesRepository,
         IRestaurantsRepository restaurantsRepository,
-        ILogger<GetDishByIdFromRestaurantHandler> logger, IMapper mapper) : IRequestHandler<GetDishByIdFromRestaurantQuery, DishDto>
+        ILogger<GetDishByIdFromRestaurantQueryHandler> logger, IMapper mapper) : IRequestHandler<GetDishByIdFromRestaurantQuery, DishDto>
 {
     public async Task<DishDto> Handle(GetDishByIdFromRestaurantQuery request, CancellationToken cancellationToken)
     {
@@ -22,7 +21,7 @@ public class GetDishByIdFromRestaurantHandler(IDishesRepository dishesRepository
             throw new NotFoundException($"Restaurant with id {request.RestaurantId} not found.");
         }
 
-        var dish = await dishesRepository.GetDishByIdFromRestaurant(request.RestaurantId, request.DishId);
+        var dish = await dishesRepository.GetDishByIdFromRestaurant(request.DishId, request.RestaurantId);
 
         if (dish == null)
         {

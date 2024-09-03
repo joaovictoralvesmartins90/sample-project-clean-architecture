@@ -11,20 +11,20 @@ public class DeleteDishCommandHandler(ILogger<DeleteDishCommandHandler> logger, 
     {
         logger.LogInformation($"Deleting dish {request.DishId} from restaurant {request.RestaurantId}...");
         var restaurant = await restaurantsRepository.GetRestaurantByIdAsync(request.RestaurantId);
-        
+
         if (restaurant == null)
         {
             throw new NotFoundException($"Restaurant with id {request.RestaurantId} not found.");
         }
 
-        var dish = restaurant.Dishes.Where(d => d.Id == request.DishId).SingleOrDefault();
+        var dish = await dishesRepository.GetDishByIdFromRestaurant(request.DishId, request.RestaurantId);
 
         if (dish == null)
         {
             throw new NotFoundException($"Dish with id {request.DishId} not found.");
         }
 
-        await dishesRepository.DeleteDishFromRestaurant(request.RestaurantId, request.DishId);
+        await dishesRepository.DeleteDishFromRestaurant(request.DishId, request.RestaurantId);
 
     }
 }
