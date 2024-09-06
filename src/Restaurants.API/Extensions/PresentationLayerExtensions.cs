@@ -1,4 +1,6 @@
 ﻿using Restaurants.API.Middlewares;
+using Restaurants.Domain.Entities;
+using Restaurants.Infrastructure.Persistence;
 using Serilog;
 using Serilog.Events;
 
@@ -20,5 +22,10 @@ public static class PresentationLayerExtensions
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
                 .WriteTo.Console();
         });
+        services.AddAuthentication();
+        services.AddAuthorization();
+        services
+            .AddIdentityApiEndpoints<User>()
+            .AddEntityFrameworkStores<RestaurantsSqliteDbContext>();
     }
 }
