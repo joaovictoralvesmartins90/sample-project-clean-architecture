@@ -384,3 +384,16 @@ dotnet add package Microsoft.AspNetCore.Identity.UI - para telas/endpoints
 dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore - funcionalidade core
 
 *após mudar as classes de dbcontext, criar migrações e executar para gerar tabelas no banco
+
+*obs: por padrão, identitycore tem suporte a minimal apis, sendo assim, que sem a linha:
+
+builder.Services.AddEndpointsApiExplorer();
+
+Os endpoints não aparecem no swagger.
+
+=========================
+
+Adicionando identidade aos endpoints:
+
+Em alguns casos, os endpoins necessitam de que o usuário esteja identificado para poder usar.
+
