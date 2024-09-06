@@ -313,9 +313,6 @@ daquele restaurante só pode existir quando existir um restaurante primeiro, sen
 
 Então, faz mais sentido um controlador separado para a entidade de pratos.
 
-
-
-
 =============================
 
 Authentication:
@@ -396,4 +393,82 @@ Os endpoints não aparecem no swagger.
 Adicionando identidade aos endpoints:
 
 Em alguns casos, os endpoins necessitam de que o usuário esteja identificado para poder usar.
+
+==========================
+
+Asp.net identity é uma solução completa de usuários, papéis, autenticação e autorização. Na versão mais nova do dotnet 8, ele também tem suporte aos endpoints para
+poder realizar tais funções (identity api endpoints).
+
+1-O primeiro passo seria criar o dbcontext:
+
+public class ApplicationDbContext: DbContext
+{
+    
+}
+
+No entanto, como queremos incorporar autenticação no projeto, é necessário implementar IdentityDbContext:
+
+public class ApplicationDbContext: IdentityDbContext
+{
+    
+}
+
+Com isso, ele dá acesso às tabelas referentes de autenticação e autorização, além das demais que forem criadas aqui dentro. Outro ponto é que podemos extender o usuário padrão, que é o
+IdentityUser:
+
+using Microsoft.AspNetCore.Identity;
+
+namespace Authtest.Models
+{
+    public class User: IdentityUser
+    {
+    }
+}
+
+User herdando de IdentityUser vai ter tudo dele mais o que for customizado. Agora, podemos dizer ao IdentityDbContext que ao invés de olhar para o IdentityUser (padrão), que 
+ele olhe para User:
+
+public class ApplicationDbContext: IdentityDbContext<User>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options) { }
+}
+
+Com isso, a nível de banco de dados, já está configurado o Identity Core.
+
+2-O próximo passo é configurar a aplicação para usar o Identity. Em program.cs:
+
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+builder.Services
+    .AddIdentityApiEndpoints<User>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+Authentication diz quem você é. Authorization diz o que você pode fazer. A ordem importa aqui. Depois, adicionamos os endpoints do Identity baseados na entidade customizada que foi 
+criada para representar o usuário: .AddIdentityApiEndpoints<User>(). E por fim, dizemos que queremos usar o Identity com o EntityFramework: .AddEntityFrameworkStores<ApplicationDbContext>();
+
+*se por apenas o builder.Services.AddAuthorization(), parece que já adiciona o builder.Services.AddAuthentication.
+
+No final, mapeamos os enpoints para o usuário criado:
+
+app.MapIdentityApi<User>();
+
+Depois criar e rodar a migração para gerar as tabelas no banco.
+
+Se formos usar o swagger como documentação de api, precisamos configurá-lo também:
+
+app.UseSwagger();
+app.UseSwaggerUI();
+app.MapSwagger();
+
+O Identity funciona com duas formas de autenticação: cookies ou jwt (json web token). No endpoint de login, podemos setar a propriedade useCookies para true. Assim, quando
+fizer o login, já seta para nós o cookie de autenticação.
+
+É possível também customizar rotas para que elas exijam ou não autorização:
+
+app.MapGet("/", () => { 
+    return "hello world";
+}).RequireAuthorization();
+
+Se não tiver o cookie setado, vai dar 401
+
 
