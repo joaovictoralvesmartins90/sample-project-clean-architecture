@@ -1,16 +1,17 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Restaurants.Domain.Entities;
 
 namespace Restaurants.Infrastructure.Persistence;
 
-public class RestaurantsSqliteDbContext : DbContext
+public class RestaurantsSqliteDbContext : IdentityDbContext<User>
 {
     internal DbSet<Restaurant> Restaurants { get; set; }
     internal DbSet<Dish> Dishes { get; set; }
 
     public string DbPath { get; }
 
-    public RestaurantsSqliteDbContext()
+    public RestaurantsSqliteDbContext(DbContextOptions<RestaurantsSqliteDbContext> options) : base(options)
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);

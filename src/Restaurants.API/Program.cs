@@ -4,6 +4,8 @@ using Restaurants.Infrastructure.Seeders;
 using Serilog;
 using Serilog.Events;
 using Restaurants.API.Middlewares;
+using Restaurants.Domain.Entities;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,6 +14,7 @@ builder.Services.AddScoped<TimeLoggingMiddleware>();
 
 builder.Services.AddControllers();
 builder.Services.AddApplication();
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrasctructure(builder.Configuration);
 builder.Host.UseSerilog((context, configuration) =>
@@ -43,5 +46,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapIdentityApi<User>();
 
 app.Run();
