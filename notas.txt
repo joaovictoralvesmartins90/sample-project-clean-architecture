@@ -312,3 +312,163 @@ daquele restaurante só pode existir quando existir um restaurante primeiro, sen
 /api/dishes -> só faria mais sentido se dish/pratos fosse uma entidade auto contida, que não dependesse de outra para existir.
 
 Então, faz mais sentido um controlador separado para a entidade de pratos.
+
+=============================
+
+Authentication:
+
+É o meio pelo qual um usuário se identifica em um sistema, para dizer que ele é ele mesmo.
+Pode ser feito por tokens, pin, chave privada, etc. Ou seja, uma forma de um usuário provar sua
+identidade.
+
+Existem diferentes categorias de processos de autenticação:
+
+1-Algo que você saiba: senha, pin, resposta de uma pergunta secreta
+2-Algo que você tenha: token, cartão
+3-Algo que você é: digital, reconhecimento de face, voz
+
+Muitas aplicações usam autenticação em dois fatores: algo que você sabe com algo que você tenha.
+Por exemplo: usuário entra em uma aplicação e a mesma pede por alguma informação que só ele saiba (token).
+
+Asp.net core identity: provê autenticação e autorização. Ele tem classes prontas que possuem informação
+sobre como queremos identificar o usuário e seus papéis: IdentityUser e IdentityRole. Além disso,
+um dbcontext para essa parte de identificar e autorizar o usuário. Ele também possui interfaces
+e métodos auxiliares para poder lidar com senhas, remoção de usuário da aplicação, registro, exposição de
+endpoints, etc. Ele também trabalha em conjunto com o Entity Framework para lidar com as tabelas e banco
+de dados.
+
+E estrutura básica de identidade seria (de baixo para cima):
+
+1-IdentityUser
+2-IdentityDbContext
+3-UserStore
+4-UserManager
+5-IdentityEnpoints
+
+
+
+Para configurar:
+
+1-É possível usar a classe base IdentityUser, mas se quisermos customizar, podemos criar uma outra classe
+que herde dela:
+
+using Microsoft.AspNetCore.Identity;
+
+namespace Restaurants.Domain.Entities;
+
+public class User : IdentityUser 
+{
+    //customizar aqui
+}
+
+2-No nosso contexto de banco de dados, é preciso alterar para que ele implemente de IdentityDbContext<User>
+para que na hora de gerar as migrações, as tabelas apropriadas sejam criadas.
+
+3-Na configuração da aplicação (no caso, no módulo Application), precisamos habilitar 
+os endpoints relacionados a autenticação e autorização, além de indicar que o contexto do banco de dados vai ser usado:
+
+services.AddIdentityApiEndpoints<User>().AddEntityFrameworkStores<RestaurantsSqliteDbContext>();
+
+4-Em Program.cs, indicar que o AddEndpointsApiExplorer() vai ser chamado para disponibilizar os endpoints,
+e que deve-se mapear a classe User criada para os endpoints, para que o .net saiba qual classe usar:
+
+builder.Services.AddEndpointsApiExplorer();
+app.MapIdentityApi<User>();
+
+*instalar:
+
+dotnet add package Microsoft.AspNetCore.Identity.UI - para telas/endpoints
+dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore - funcionalidade core
+
+*após mudar as classes de dbcontext, criar migrações e executar para gerar tabelas no banco
+
+*obs: por padrão, identitycore tem suporte a minimal apis, sendo assim, que sem a linha:
+
+builder.Services.AddEndpointsApiExplorer();
+
+Os endpoints não aparecem no swagger.
+
+=========================
+
+Adicionando identidade aos endpoints:
+
+Em alguns casos, os endpoins necessitam de que o usuário esteja identificado para poder usar.
+
+==========================
+
+Asp.net identity é uma solução completa de usuários, papéis, autenticação e autorização. Na versão mais nova do dotnet 8, ele também tem suporte aos endpoints para
+poder realizar tais funções (identity api endpoints).
+
+1-O primeiro passo seria criar o dbcontext:
+
+public class ApplicationDbContext: DbContext
+{
+    
+}
+
+No entanto, como queremos incorporar autenticação no projeto, é necessário implementar IdentityDbContext:
+
+public class ApplicationDbContext: IdentityDbContext
+{
+    
+}
+
+Com isso, ele dá acesso às tabelas referentes de autenticação e autorização, além das demais que forem criadas aqui dentro. Outro ponto é que podemos extender o usuário padrão, que é o
+IdentityUser:
+
+using Microsoft.AspNetCore.Identity;
+
+namespace Authtest.Models
+{
+    public class User: IdentityUser
+    {
+    }
+}
+
+User herdando de IdentityUser vai ter tudo dele mais o que for customizado. Agora, podemos dizer ao IdentityDbContext que ao invés de olhar para o IdentityUser (padrão), que 
+ele olhe para User:
+
+public class ApplicationDbContext: IdentityDbContext<User>
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options) { }
+}
+
+Com isso, a nível de banco de dados, já está configurado o Identity Core.
+
+2-O próximo passo é configurar a aplicação para usar o Identity. Em program.cs:
+
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+builder.Services
+    .AddIdentityApiEndpoints<User>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+Authentication diz quem você é. Authorization diz o que você pode fazer. A ordem importa aqui. Depois, adicionamos os endpoints do Identity baseados na entidade customizada que foi 
+criada para representar o usuário: .AddIdentityApiEndpoints<User>(). E por fim, dizemos que queremos usar o Identity com o EntityFramework: .AddEntityFrameworkStores<ApplicationDbContext>();
+
+*se por apenas o builder.Services.AddAuthorization(), parece que já adiciona o builder.Services.AddAuthentication.
+
+No final, mapeamos os enpoints para o usuário criado:
+
+app.MapIdentityApi<User>();
+
+Depois criar e rodar a migração para gerar as tabelas no banco.
+
+Se formos usar o swagger como documentação de api, precisamos configurá-lo também:
+
+app.UseSwagger();
+app.UseSwaggerUI();
+app.MapSwagger();
+
+O Identity funciona com duas formas de autenticação: cookies ou jwt (json web token). No endpoint de login, podemos setar a propriedade useCookies para true. Assim, quando
+fizer o login, já seta para nós o cookie de autenticação.
+
+É possível também customizar rotas para que elas exijam ou não autorização:
+
+app.MapGet("/", () => { 
+    return "hello world";
+}).RequireAuthorization();
+
+Se não tiver o cookie setado, vai dar 401
+
+
