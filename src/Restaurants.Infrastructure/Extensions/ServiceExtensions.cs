@@ -13,13 +13,18 @@ public static class ServiceExtensions
     public static void AddInfrasctructure(this IServiceCollection services, IConfiguration configuration)
     {
         string? connectionString = configuration.GetConnectionString("development");
-        // services.AddDbContext<RestaurantsDbContext>(
-        //     options => options.UseMySQL(connectionString)
-        // );
+        services.AddDbContext<RestaurantsDbContext>(
+            options => options.UseMySQL(connectionString)
+        );
+        services.AddScoped<IRestaurantSeeder, RestaurantSeeder>();
+        services.AddScoped<IRestaurantsRepository, RestaurantsRepository>();
+        services.AddScoped<IDishesRepository, DishesRepository>();
+    }
+
+    public static void AddInfrastructureSqlite(this IServiceCollection services, IConfiguration configuration)
+    {
         services.AddDbContext<RestaurantsSqliteDbContext>();
-        //services.AddScoped<IRestaurantSeeder, RestaurantSeeder>();
         services.AddScoped<IRestaurantSeeder, RestaurantSqliteSeeder>();
-        //services.AddScoped<IRestaurantRepository, RestaurantsRepository>();
         services.AddScoped<IRestaurantsRepository, RestaurantsSqliteRepository>();
         services.AddScoped<IDishesRepository, DishesSqliteRepository>();
     }
