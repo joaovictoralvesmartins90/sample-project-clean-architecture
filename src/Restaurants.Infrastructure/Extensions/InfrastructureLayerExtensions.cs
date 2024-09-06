@@ -8,9 +8,9 @@ using Restaurants.Infrastructure.Seeders;
 
 namespace Restaurants.Infrastructure.Extensions;
 
-public static class ServiceExtensions
+public static class InfrastructureLayerExtensions
 {
-    public static void AddInfrasctructure(this IServiceCollection services, IConfiguration configuration)
+    public static void AddInfrastructureLayerExtensions(this IServiceCollection services, IConfiguration configuration)
     {
         string? connectionString = configuration.GetConnectionString("development");
         services.AddDbContext<RestaurantsDbContext>(
@@ -21,7 +21,7 @@ public static class ServiceExtensions
         services.AddScoped<IDishesRepository, DishesRepository>();
     }
 
-    public static void AddInfrastructureSqlite(this IServiceCollection services, IConfiguration configuration)
+    public static void AddInfrastructureLayerExtensionsSqlite(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<RestaurantsSqliteDbContext>();
         services.AddScoped<IRestaurantSeeder, RestaurantSqliteSeeder>();
