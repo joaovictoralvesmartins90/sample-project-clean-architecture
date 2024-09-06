@@ -312,3 +312,75 @@ daquele restaurante só pode existir quando existir um restaurante primeiro, sen
 /api/dishes -> só faria mais sentido se dish/pratos fosse uma entidade auto contida, que não dependesse de outra para existir.
 
 Então, faz mais sentido um controlador separado para a entidade de pratos.
+
+
+
+
+=============================
+
+Authentication:
+
+É o meio pelo qual um usuário se identifica em um sistema, para dizer que ele é ele mesmo.
+Pode ser feito por tokens, pin, chave privada, etc. Ou seja, uma forma de um usuário provar sua
+identidade.
+
+Existem diferentes categorias de processos de autenticação:
+
+1-Algo que você saiba: senha, pin, resposta de uma pergunta secreta
+2-Algo que você tenha: token, cartão
+3-Algo que você é: digital, reconhecimento de face, voz
+
+Muitas aplicações usam autenticação em dois fatores: algo que você sabe com algo que você tenha.
+Por exemplo: usuário entra em uma aplicação e a mesma pede por alguma informação que só ele saiba (token).
+
+Asp.net core identity: provê autenticação e autorização. Ele tem classes prontas que possuem informação
+sobre como queremos identificar o usuário e seus papéis: IdentityUser e IdentityRole. Além disso,
+um dbcontext para essa parte de identificar e autorizar o usuário. Ele também possui interfaces
+e métodos auxiliares para poder lidar com senhas, remoção de usuário da aplicação, registro, exposição de
+endpoints, etc. Ele também trabalha em conjunto com o Entity Framework para lidar com as tabelas e banco
+de dados.
+
+E estrutura básica de identidade seria (de baixo para cima):
+
+1-IdentityUser
+2-IdentityDbContext
+3-UserStore
+4-UserManager
+5-IdentityEnpoints
+
+
+
+Para configurar:
+
+1-É possível usar a classe base IdentityUser, mas se quisermos customizar, podemos criar uma outra classe
+que herde dela:
+
+using Microsoft.AspNetCore.Identity;
+
+namespace Restaurants.Domain.Entities;
+
+public class User : IdentityUser 
+{
+    //customizar aqui
+}
+
+2-No nosso contexto de banco de dados, é preciso alterar para que ele implemente de IdentityDbContext<User>
+para que na hora de gerar as migrações, as tabelas apropriadas sejam criadas.
+
+3-Na configuração da aplicação (no caso, no módulo Application), precisamos habilitar 
+os endpoints relacionados a autenticação e autorização, além de indicar que o contexto do banco de dados vai ser usado:
+
+services.AddIdentityApiEndpoints<User>().AddEntityFrameworkStores<RestaurantsSqliteDbContext>();
+
+4-Em Program.cs, indicar que o AddEndpointsApiExplorer() vai ser chamado para disponibilizar os endpoints,
+e que deve-se mapear a classe User criada para os endpoints, para que o .net saiba qual classe usar:
+
+builder.Services.AddEndpointsApiExplorer();
+app.MapIdentityApi<User>();
+
+*instalar:
+
+dotnet add package Microsoft.AspNetCore.Identity.UI - para telas/endpoints
+dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore - funcionalidade core
+
+*após mudar as classes de dbcontext, criar migrações e executar para gerar tabelas no banco
