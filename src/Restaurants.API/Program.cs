@@ -28,7 +28,10 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseMiddleware<TimeLoggingMiddleware>();
 
 app.MapSwagger();
-app.MapIdentityApi<User>();
+app.MapGroup("api/identity")
+    .WithTags("Identity")
+    .MapIdentityApi<User>();
+
 app.MapControllers();
 
 app.UseSerilogRequestLogging();
