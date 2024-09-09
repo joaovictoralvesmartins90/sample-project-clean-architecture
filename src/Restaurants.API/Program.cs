@@ -33,6 +33,6 @@ app.MapControllers();
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
-app.UseAuthorization();
+//app.UseAuthorization();
 
 app.Run();

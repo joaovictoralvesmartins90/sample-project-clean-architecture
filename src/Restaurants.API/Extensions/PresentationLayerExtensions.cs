@@ -1,4 +1,5 @@
-﻿using Restaurants.API.Middlewares;
+﻿using Microsoft.AspNetCore.Identity;
+using Restaurants.API.Middlewares;
 using Restaurants.Domain.Entities;
 using Restaurants.Infrastructure.Persistence;
 using Serilog;
@@ -25,6 +26,7 @@ public static class PresentationLayerExtensions
         services.AddAuthentication();
         services
             .AddIdentityApiEndpoints<User>()
+            .AddRoles<IdentityRole>() 
             .AddEntityFrameworkStores<RestaurantsSqliteDbContext>();
     }
 }

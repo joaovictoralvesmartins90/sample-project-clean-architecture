@@ -7,6 +7,8 @@ using Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Commands.DeleteRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Commands.UpdateRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Queries.GetAllRestaurants;
+using Restaurants.Application.Mediator.Users;
+using System.Security.Claims;
 
 namespace Restaurants.API.Controllers;
 
