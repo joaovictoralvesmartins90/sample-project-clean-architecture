@@ -23,7 +23,6 @@ public static class PresentationLayerExtensions
                 .WriteTo.Console();
         });
         services.AddAuthentication();
-        services.AddAuthorization();
         services
             .AddIdentityApiEndpoints<User>()
             .AddEntityFrameworkStores<RestaurantsSqliteDbContext>();

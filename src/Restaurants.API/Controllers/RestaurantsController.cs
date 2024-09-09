@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Commands.DeleteRestaurant;
@@ -11,12 +12,14 @@ namespace Restaurants.API.Controllers;
 
 [ApiController]
 [Route("api/restaurants")]
+[Authorize]
 public class RestaurantsController(IMediator mediator,
     IValidator<CreateRestaurantCommand> validator,
     IValidator<UpdateRestaurantCommand> updateValidator) : ControllerBase
 {
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var restaurants = await mediator.Send(new GetAllRestaurantsQuery());
