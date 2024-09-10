@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+using Restaurants.Domain.Constants;
 using Restaurants.Domain.Entities;
 using Restaurants.Infrastructure.Persistence;
 
@@ -15,7 +17,26 @@ internal class RestaurantSqliteSeeder(RestaurantsSqliteDbContext restaurantsSqli
                 restaurantsSqliteDbContext.Restaurants.AddRange(restaurants);
                 await restaurantsSqliteDbContext.SaveChangesAsync();
             }
+
+            if (!restaurantsSqliteDbContext.Roles.Any())
+            {
+                var roles = GetRoles();
+                restaurantsSqliteDbContext.Roles.AddRange(roles);
+                await restaurantsSqliteDbContext.SaveChangesAsync();
+            }
+
         }
+    }
+
+    private IEnumerable<IdentityRole> GetRoles()
+    {
+        List<IdentityRole> roles = [
+            new (UserRoles.User),
+            new (UserRoles.Owner),
+            new (UserRoles.Admin)
+        ];
+
+        return roles;
     }
 
     private IEnumerable<Restaurant> GetRestaurants()

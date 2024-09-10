@@ -8,6 +8,7 @@ using Restaurants.Application.Mediator.Restaurants.Commands.DeleteRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Commands.UpdateRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Queries.GetAllRestaurants;
 using Restaurants.Application.Mediator.Users;
+using Restaurants.Domain.Constants;
 using System.Security.Claims;
 
 namespace Restaurants.API.Controllers;
@@ -36,6 +37,7 @@ public class RestaurantsController(IMediator mediator,
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Owner)]
     public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantCommand createRestaurantCommand)
     {
         ValidationResult result = await validator.ValidateAsync(createRestaurantCommand);

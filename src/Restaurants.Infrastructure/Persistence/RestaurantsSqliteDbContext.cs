@@ -11,11 +11,11 @@ public class RestaurantsSqliteDbContext : IdentityDbContext<User>
 
     public string DbPath { get; }
 
-    public RestaurantsSqliteDbContext(DbContextOptions<RestaurantsSqliteDbContext> options): base(options)
+    public RestaurantsSqliteDbContext(DbContextOptions<RestaurantsSqliteDbContext> options) : base(options)
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);
-        DbPath = Path.Join(path, "restaurants.db");
+        DbPath = Path.Join(path, "restaurantsV2.db");
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
