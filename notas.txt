@@ -469,6 +469,47 @@ app.MapGet("/", () => {
     return "hello world";
 }).RequireAuthorization();
 
-Se não tiver o cookie setado, vai dar 401
+Se não tiver o cookie setado, vai dar 401.
 
+
+OBS: Na configuração de autorização e autenticação, só usar o método services.AddAuthentication();
+Pois ao tentar passar um token ele fica indicando que o usuário não está autenticado.
+
+Para poder assegurar que uma rota seja acessada somente por autorização:
+
+[HttpGet]
+[Authorize] -> apenas quem estiver autorizado
+public async Task<IActionResult> GetAll()
+{
+    var restaurants = await mediator.Send(new GetAllRestaurantsQuery());
+    return Ok(restaurants);
+}
+
+Ou então, coloca o [Authorize] a nível de controlador para que todo ele seja passivo de autorização.
+
+*adicinando um endpoint para logout:
+
+//route for logout
+app.MapPost("/logout", async (SignInManager<User> signInManager) =>
+{
+    await signInManager.SignOutAsync().ConfigureAwait(false);
+}).RequireAuthorization();
+
+
+Outra propriedade que podemos usar é [AllowAnonymous] para permitir que alguns endpoints sejam acessados
+sem autorização:
+
+[HttpGet]
+[AllowAnonymous]
+public async Task<IActionResult> GetAll()
+{
+    var restaurants = await mediator.Send(new GetAllRestaurantsQuery());
+    return Ok(restaurants);
+}
+
+=============================
+
+User context: uma vez que a requisição é feita, no controlador eu posso ver os dados do usuário
+através do atributo "User". Mas isso apenas vale a nivel de controlador. Como passar isso para outros niveis
+da aplicação? Podemos criar uma classe auxiliar para gerenciar esse contexto de usuário em "Application".
 
