@@ -509,7 +509,202 @@ public async Task<IActionResult> GetAll()
 
 =============================
 
-User context: uma vez que a requisição é feita, no controlador eu posso ver os dados do usuário
-através do atributo "User". Mas isso apenas vale a nivel de controlador. Como passar isso para outros niveis
-da aplicação? Podemos criar uma classe auxiliar para gerenciar esse contexto de usuário em "Application".
+Authorization:
 
+Seria o conceito de verificar o que um usuário pode fazer  em uma aplicação. A forma mais comum de 
+ceder autorização é através de perfis ou papéis. Com ela também podemos limitar acesso à alguns recursos
+bem como só permitir que um usuário modifique algo que ele tenha criado.
+
+Podemos ter 3 papéis: admin, usuário comum e dono de restaurante. Já que com o identity temos
+a tabela de userroles criada, podemos inserir manualmente, o num seeder.
+
+*obs: É importante ver onde a lista de papéis irá ser definida no projeto. Se forem mais ligados ao
+dominio e a aplicação, podem ficar em domain. Se forem coisas mais próximas de infraestrutura, podem ir
+pra Infrastructure.
+
+using Microsoft.AspNetCore.Identity;
+using Restaurants.Domain.Constants;
+using Restaurants.Domain.Entities;
+using Restaurants.Infrastructure.Persistence;
+
+namespace Restaurants.Infrastructure.Seeders;
+
+internal class RestaurantSqliteSeeder(RestaurantsSqliteDbContext restaurantsSqliteDbContext) : IRestaurantSeeder
+{
+    public async Task Seed()
+    {
+        if (await restaurantsSqliteDbContext.Database.CanConnectAsync())
+        {
+            if (!restaurantsSqliteDbContext.Restaurants.Any())
+            {
+                var restaurants = GetRestaurants();
+                restaurantsSqliteDbContext.Restaurants.AddRange(restaurants);
+                await restaurantsSqliteDbContext.SaveChangesAsync();
+            }
+
+            if (!restaurantsSqliteDbContext.Roles.Any())
+            {
+                var roles = GetRoles();
+                restaurantsSqliteDbContext.Roles.AddRange(roles);
+                await restaurantsSqliteDbContext.SaveChangesAsync();
+            }
+
+        }
+    }
+
+    private IEnumerable<IdentityRole> GetRoles()
+    {
+        List<IdentityRole> roles = [
+            new (UserRoles.User),
+            new (UserRoles.Owner),
+            new (UserRoles.Admin)
+        ];
+
+        return roles;
+    }
+
+    private IEnumerable<Restaurant> GetRestaurants()
+    {
+        List<Restaurant> restaurants = [
+            new(){
+                Name = "KFC",
+                Category = "Fast Food",
+                Description = "Finger lickin' good!",
+                ContactEmail = "kfc@kfc.com",
+                HasDelivery = true,
+                Dishes = [
+                    new(){
+                        Name = "Fried Chicken 1",
+                        Description = "Fried Chicken 1!",
+                        Price = 10,
+                    },
+                    new(){
+                        Name = "Fried Chicken 2",
+                        Description = "Fried Chicken 2!",
+                        Price = 20,
+                    },
+                ],
+                Address = new() {
+                    City = "Recife",
+                    PostalCode = "50920-525",
+                    Street = "Av. Padre Ibiapina"
+                }
+            },
+            new(){
+                Name = "McDonalds",
+                Category = "Fast Food",
+                Description = "I'm lovin' it!",
+                ContactEmail = "mcdonalds@mcdonalds.com",
+                HasDelivery = true,
+                Dishes = [
+                    new(){
+                        Name = "BigMac",
+                        Description = "BigMac!",
+                        Price = 10,
+                    },
+                    new(){
+                        Name = "McFish",
+                        Description = "McFish!",
+                        Price = 20,
+                    },
+                ],
+                Address = new() {
+                    City = "Recife 2",
+                    PostalCode = "50920-525-2",
+                    Street = "Av. Padre Ibiapina 2"
+                }
+            },
+        ];
+        return restaurants;
+    }
+}
+
+Exemplo de como ficaria o seeder acima.
+
+Para ligar um usuário a um papel, temos a tabela AspNetUserRoles, que é 1-n, onde um usuário
+pode ter mais de um papel. Basta um insert nessa tabela. Agora o próximo passo seria aplicar a autorização
+no código. A anotação [Authorize] pode ser usada de duas formas: sem nada, indicando que um controlador
+ou endpoint só pode ser acessado se o usuário tem um token válido, ou passando um papel específico:
+
+[Authorize(Roles = "Admin")] -> indica que o usuário deve ser um admin para poder acessar.
+
+Outra forma é usando o objeto User nos controladores:
+
+User.IsInRole("admin") -> verifica se o usuário atual é um admin.
+
+Agora é preciso configurar a aplicação para permitir o uso de papéis:
+
+services
+.AddIdentityApiEndpoints<User>()
+.AddRoles<IdentityRole>() 
+.AddEntityFrameworkStores<RestaurantsSqliteDbContext>();
+
+Uma diferença entre papel e alegação (claim) é que papel seria uma função a ser executada.
+Alegação é algo sobre determinado usuário, o que pode ser usado como autorização. 
+
+Nem toda alegação pode ser um papel. Por exemplo: data de nascimento de determinado usuário.
+
+
+==================
+
+Atribuindo papéis a usuários: geralmente, essa tarefa fica a cargo de um admin. Podemos criar endpoints
+específicos para admins para tratarem dessa operação.
+
+Podemos criar um command e um handler passando o email e o nome do papel:
+
+using MediatR;
+
+namespace Restaurants.Application.Mediator.Users.Commands.AssignUserRole;
+
+public class AssignUserRoleCommand : IRequest
+{
+    public string UserEmail { get; set; }
+    public string RoleName { get; set; }
+}
+
+E o handler:
+
+using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Restaurants.Domain.Entities;
+using Restaurants.Domain.Exceptions;
+
+namespace Restaurants.Application.Mediator.Users.Commands.AssignUserRole;
+
+public class AssignUserRoleCommandHandler(UserManager<User> userManager, RoleManager<IdentityRole> roleManager) : IRequestHandler<AssignUserRoleCommand>
+{
+    public async Task Handle(AssignUserRoleCommand request, CancellationToken cancellationToken)
+    {
+        var role = await roleManager.FindByNameAsync(request.RoleName);
+        var user = await userManager.FindByEmailAsync(request.UserEmail);
+
+        if (role == null)
+        {
+            throw new NotFoundException("Role not found.");
+        }
+
+        if (user == null)
+        {
+            throw new NotFoundException("User not found.");
+        }
+
+        await userManager.AddToRoleAsync(user, role.Name);
+
+    }
+}
+
+OBS: o identity core utiliza o atributo normalized name do papel, que seria seu nome maiúsculo.
+Para evitar problemas, no seeder vamos inicializar esse atributo também:
+
+new (UserRoles.User)
+{
+    NormalizedName = UserRoles.User.ToUpper()
+},
+new (UserRoles.Owner)
+{
+    NormalizedName = UserRoles.Owner.ToUpper()
+},
+new (UserRoles.Admin)
+{
+    NormalizedName = UserRoles.Admin.ToUpper()
+}
