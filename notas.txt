@@ -708,3 +708,7 @@ new (UserRoles.Admin)
 {
     NormalizedName = UserRoles.Admin.ToUpper()
 }
+
+Para remover um usuário de um papel:
+
+RemoveFromRoleAsync
