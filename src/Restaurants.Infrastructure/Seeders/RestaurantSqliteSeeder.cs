@@ -11,12 +11,12 @@ internal class RestaurantSqliteSeeder(RestaurantsSqliteDbContext restaurantsSqli
     {
         if (await restaurantsSqliteDbContext.Database.CanConnectAsync())
         {
-            if (!restaurantsSqliteDbContext.Restaurants.Any())
-            {
-                var restaurants = GetRestaurants();
-                restaurantsSqliteDbContext.Restaurants.AddRange(restaurants);
-                await restaurantsSqliteDbContext.SaveChangesAsync();
-            }
+            //if (!restaurantsSqliteDbContext.Restaurants.Any())
+            //{
+            //    var restaurants = GetRestaurants();
+            //    restaurantsSqliteDbContext.Restaurants.AddRange(restaurants);
+            //    await restaurantsSqliteDbContext.SaveChangesAsync();
+            //}
 
             if (!restaurantsSqliteDbContext.Roles.Any())
             {
