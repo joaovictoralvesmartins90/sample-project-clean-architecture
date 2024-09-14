@@ -4,6 +4,6 @@ namespace Restaurants.Application.Mediator.Users.Commands.AssignUserRole;
 
 public class UnassignUserRoleCommand : IRequest
 {
-    public string UserEmail { get; set; }
-    public string RoleName { get; set; }
+    public string UserEmail { get; set; } = default!;
+    public string RoleName { get; set; } = default!;
 }

@@ -46,7 +46,8 @@ public class RestaurantsController(IMediator mediator,
         }
         else
         {
-            var userId = User.FindFirstValue
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            createRestaurantCommand.UserId = userId;
             int id = await mediator.Send(createRestaurantCommand);
             return CreatedAtAction(nameof(CreateRestaurant), new { id }, null);
         }

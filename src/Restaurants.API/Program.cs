@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddPresentationLayerExtensions(builder.Host);
 builder.Services.AddApplicationLayerExtensions();
-builder.Services.AddInfrastructureLayerExtensionsSqlite(builder.Configuration);
+builder.Services.AddInfrastructureLayerExtensions(builder.Configuration);
 
 var app = builder.Build();
 var scope = app.Services.CreateScope();
