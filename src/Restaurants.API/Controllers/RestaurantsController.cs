@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
@@ -7,9 +8,7 @@ using Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Commands.DeleteRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Commands.UpdateRestaurant;
 using Restaurants.Application.Mediator.Restaurants.Queries.GetAllRestaurants;
-using Restaurants.Application.Mediator.Users;
 using Restaurants.Domain.Constants;
-using System.Security.Claims;
 
 namespace Restaurants.API.Controllers;
 
@@ -47,6 +46,7 @@ public class RestaurantsController(IMediator mediator,
         }
         else
         {
+            var userId = User.FindFirstValue
             int id = await mediator.Send(createRestaurantCommand);
             return CreatedAtAction(nameof(CreateRestaurant), new { id }, null);
         }

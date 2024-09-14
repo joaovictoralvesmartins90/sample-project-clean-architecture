@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using System.Text.Json.Serialization;
+using MediatR;
+using Restaurants.Domain.Entities;
 
 namespace Restaurants.Application.Mediator.Restaurants.Commands.CreateRestaurant;
 
@@ -13,4 +15,6 @@ public class CreateRestaurantCommand : IRequest<int>
     public string? City { get; set; }
     public string? Street { get; set; }
     public string? PostalCode { get; set; }
+    [JsonIgnore]
+    public string UserId;
 }

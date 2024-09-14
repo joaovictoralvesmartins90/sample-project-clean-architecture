@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Restaurants.API.Middlewares;
 using Restaurants.Domain.Entities;
+using Restaurants.Infrastructure.Authorization;
 using Restaurants.Infrastructure.Persistence;
 using Serilog;
 using Serilog.Events;
@@ -26,7 +27,12 @@ public static class PresentationLayerExtensions
         services.AddAuthentication();
         services
             .AddIdentityApiEndpoints<User>()
-            .AddRoles<IdentityRole>() 
+            .AddRoles<IdentityRole>()
+            .AddClaimsPrincipalFactory<RestaurantsUserClaimsPrincipalFactory>()
             .AddEntityFrameworkStores<RestaurantsSqliteDbContext>();
+
+        services.AddAuthorizationBuilder()
+            .AddPolicy("HasNationality",
+                builder => builder.RequireClaim("Nationality"));
     }
 }

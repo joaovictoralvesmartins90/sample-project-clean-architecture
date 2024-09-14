@@ -1,0 +1,18 @@
+Para executar um add migration no vscode: 
+
+dotnet ef migrations add 
+<nome> 
+--project Restaurants.Infrastructure.csproj 
+--startup-project ../Restaurants.API/Restaurants.API.csproj 
+--context <nome_context>
+
+Aqui precisa dizer qual o projeto onde vai ser executado, no caso Infra, e o de startup, que seria API
+pois da forma como foi montado, o dotnet ef precisa saber o caminho de onde encontrar as dependências.
+No visual studio, basta selecionar o projeto Infra e executar add-migration.
+
+Para atualizar a base:
+
+dotnet ef database update 
+<nome> 
+--startup-project ../Restaurants.API/Restaurants.API.csproj 
+--context <nome_context>

@@ -712,3 +712,92 @@ new (UserRoles.Admin)
 Para remover um usuário de um papel:
 
 RemoveFromRoleAsync
+
+=======================
+
+Custom user claims:
+
+O Microsoft Identity Core usa em conjunto com roles, o que se chama de claims, ou atributos de um usuário.
+Geralmente são informações particulares de um usuário que ajudam a decidir na autorização/autenticação.
+Por exemplo, email, nome de usuário, etc. Geralmente incluídos em tokens. Por exemplo em JWT:
+
+ var claims = new[]
+{
+    new Claim(JwtRegisteredClaimNames.Sub, username),
+    new Claim(JwtRegisteredClaimNames.Email, email),
+    new Claim(ClaimTypes.Role, role)
+};
+
+var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("your_secret_key_here"));
+var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+var token = new JwtSecurityToken(
+    issuer: "your_issuer",
+    audience: "your_audience",
+    claims: claims,
+    expires: DateTime.UtcNow.AddHours(1),
+    signingCredentials: creds
+);
+
+return new JwtSecurityTokenHandler().WriteToken(token);
+
+Se criam claims que são passadas como parâmetro para a construção de um token de autenticação.
+
+Na aplicação podemos extender a classe base que gera os claims: UserClaimsPrincipalFactory.
+Ela recebe o tipo de usuário e o de roles. Se forem os padrão, seriam IdentityUser e IdentityRole.
+
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Restaurants.Domain.Entities;
+
+namespace Restaurants.Infrastructure.Authorization;
+
+public class RestaurantsUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<User, IdentityRole>
+{
+    public RestaurantsUserClaimsPrincipalFactory(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> options) : base(userManager, roleManager, options)
+    {
+    }
+
+    public override async Task<ClaimsPrincipal> CreateAsync(User user)
+    {
+        var id = await GenerateClaimsAsync(user);
+
+        if (user.Nationality is not null)
+        {
+            id.AddClaim(new Claim("Nationality", user.Nationality));
+        }
+
+        if (user.DateOfBirth is not null)
+        {
+            id.AddClaim(new Claim("DateOfBirth", user.DateOfBirth.Value.ToString("yyyy-MM-dd")));
+        }
+
+        return new ClaimsPrincipal(id);
+    }
+}
+
+É possível injetar aqui dbcontexts para procurar mais informações para serem feitas de claims.
+No exemplo acima, vemos se o usuário possui Nationality e DateOfBirth. Se sim, são adicionados
+como claims, que podem ser vistas em um serviço/controlador através do objeto User.
+
+Por fim, basta registrar como serviço:
+
+AddClaimsPrincipalFactory<RestaurantsUserClaimsPrincipalFactory>()
+
+Uma vez que definimos claims, podemos usá-las para garantir autorização através de políticas ou policies.
+
+services.AddAuthorizationBuilder()
+            .AddPolicy("HasNationality",
+                builder => builder.RequireClaim("Nationality"));
+
+Se adiciona o AddAuthorizationBuilder e se adiciona uma politica de que seja necessária a claim de 
+que se tenha Nationality, através do nome "HasNationality". Se para usar num controlador, por exemplo:
+
+[Authorize(Policy="HasNationality")] -> só autoriza se tiver essa claim. Além disso, posso forçar que
+além da claim, que ela seja de valores específicos:
+
+services.AddAuthorizationBuilder()
+            .AddPolicy("HasNationality",
+                builder => builder.RequireClaim("Nationality", "value1", "value2", ...));
+
