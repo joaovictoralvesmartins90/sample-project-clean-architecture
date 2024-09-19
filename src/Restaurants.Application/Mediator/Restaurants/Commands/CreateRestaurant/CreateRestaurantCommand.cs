@@ -16,5 +16,5 @@ public class CreateRestaurantCommand : IRequest<int>
     public string? Street { get; set; }
     public string? PostalCode { get; set; }
     [JsonIgnore]
-    public string UserId;
+    public string OwnerId;
 }

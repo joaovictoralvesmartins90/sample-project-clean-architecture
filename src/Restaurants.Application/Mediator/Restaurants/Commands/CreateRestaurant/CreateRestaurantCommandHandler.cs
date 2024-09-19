@@ -16,16 +16,15 @@ public class CreateRestaurantCommandHandler(ILogger<CreateRestaurantCommandHandl
         logger.LogInformation("Creating new restaurant...");
         logger.LogInformation("Creating restaurant: {@Restaurant}...", request);
 
-        var user = await userManager.FindByIdAsync(request.UserId);
+        var user = await userManager.FindByIdAsync(request.OwnerId);
 
         if (user == null)
         {
-            throw new NotFoundException($"User with id {request.UserId} not found.");
+            throw new NotFoundException($"User with id {request.OwnerId} not found.");
         }
 
         Restaurant restaurant = mapper.Map<Restaurant>(request);
-        restaurant.Owner = user;
-        restaurant.OwnerId = user.Id;
+        restaurant.OwnerId = request.OwnerId;
         return await restaurantRepository.Create(restaurant);
     }
 }

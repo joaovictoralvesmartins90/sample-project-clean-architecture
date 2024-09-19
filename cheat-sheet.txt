@@ -16,3 +16,12 @@ dotnet ef database update
 <nome> 
 --startup-project ../Restaurants.API/Restaurants.API.csproj 
 --context <nome_context>
+
+Para permitir que outros projetos (class lib) usem da biblioteca compartilhada do aspnetcore:
+
+<ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+</ItemGroup>
+
+No arquivo .csproj -> faz com que sejam referenciadas as bibliotecas do aspnetcore em projetos sem ser
+aspnet

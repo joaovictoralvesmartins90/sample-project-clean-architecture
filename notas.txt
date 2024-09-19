@@ -801,3 +801,6 @@ services.AddAuthorizationBuilder()
             .AddPolicy("HasNationality",
                 builder => builder.RequireClaim("Nationality", "value1", "value2", ...));
 
+============
+
+Podemos criar políticas customizadas: por exemplo, se um usuário tem 20 ou mais anos de idade.
