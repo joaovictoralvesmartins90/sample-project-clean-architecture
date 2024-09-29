@@ -1,0 +1,35 @@
+O Azure é uma plataforma de nuvem da Microsoft que oferece mais de 200 serviços e produtos para ajudar a criar, 
+gerenciar e implantar aplicativos. O Azure pode ser usado em ambientes de nuvem, híbridos
+e de borda, e permite a utilização de ferramentas e estruturas de escolha do usuário.
+
+Existem algumas modalidades de serviços na nuvem:
+
+1-PaaS: plataform as a service: serviços de ambientes de computação online para implantar aplicativos
+2-SaaS: software as a service: um serviço de software disponível para ser usado pela internet, como onedrive.
+3-IaaS: infrastructure as a service: hardware como um serviço (máquinas virtuais, armazenamento, etc)
+
+No azure, depois de fazer a conta, o primeiro passo é criar um app service.
+
+App Service: um container no seu plano do azure que vai conter uma ou mais aplicações.
+
+Ao criar a aplicação, no caso, web app, tem que dizer o resource group, que é um container que compartilha
+políticas, permissões, etc entre aplicações, além da subscrição da conta criada no azure. Depois, podemos 
+dizer o nome da aplicação, que vai estar ligada ao seu endereço web (sufixo .azurewebsites.net).
+
+Depois, a forma como vai ser publicado: código-fonte, imagem docker ou um site estático.
+Depois, a stack de execução, que pode ser dotnet 8, java, node, etc. Ele vai selecionar automaticamente
+uma região onde vai ser hospedado e o plano de consumo, baseado no hardware desejado.
+
+No caso de um plano grátis, não é possível configurar um banco de dados pela UI do azure, pois o mínimo
+seria um plano básico. No fim, podemos publicar e será mostrado as informações gerais do resource criado.
+
+Pelo menu lateral, podemos setar variáveis de ambiente, connection strings, versão do dotnet,
+autenticação por terceiros, entre outras coisas.
+
+Depois podemos baixar o publish profile do aplicativo, que seria um xml com informações de ftp, senha de 
+banco de dados, etc, para poder fazer o deploy/publish. (Lembrar que precisa ter as opções de autenticação
+para publicar ligadas).
+
+Pelo visual studio, basta clicar com botão direito na solução, publish, selecionar como alvo um profile.
+O visual studio vai preparar tudo e publicar no fim. No visual studio code, precisamos da extensão do azure.
+
